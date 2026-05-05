@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="header(links)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo} + ' - PGIO'"></title>
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <th:block th:replace="${links} ?: ~{}"></th:block>
+    <th:block th:replace="${scripts_head} ?: ~{}"></th:block>
+  </head>
+  <body>
+    <nav class="navbar" th:fragment="navbar">
+      <div class="nav-logo">
+        <a th:href="@{/inicio}">
+          <img
+            th:src="@{/img/logo-svg.svg}"
+            alt="Logo PGIO"
+            style="height: 40px; vertical-align: middle; margin-right: 10px"
+          />
+        </a>
+      </div>
+      <button class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <ul class="nav-list" id="nav-list">
+        <li><a th:href="@{/inicio}">Inicio</a></li>
+        <li><a href="#">Solicitudes</a></li>
+        <li><a th:href="@{/empleados}">Empleados</a></li>
+        <li><a th:href="@{/login}">Salir</a></li>
+      </ul>
+    </nav>
+    <main class="contenido"></main>
+
+    <footer class="footer" th:fragment="footer">
+      <div>
+        <p>
+          2026 <strong>PGIO</strong> - Sistema Operativo Empresarial e
+          Inteligente
+        </p>
+      </div>
+    </footer>
+    <th:block th:fragment="scripts(vistas_scripts)">
+      <script th:fragment="scripts">
+        const menu = document.getElementById("mobile-menu");
+        const nav = document.getElementById("nav-list");
+        if (menu) {
+          menu.addEventListener("click", () => {
+            nav.classList.toggle("active");
+          });
+        }
+      </script>
+      <th:block th:replace="${vistas_scripts} ?: ~{}"></th:block>
+    </th:block>
+  </body>
+</html>
