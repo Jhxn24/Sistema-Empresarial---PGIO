@@ -7,11 +7,42 @@
     <nav th:replace="~{layout :: navbar}"></nav>
 
     <main class="main-content">
-      <h1>Bienvenido al Sistema PGIO</h1>
+      <h1>Panel de Control Operativo</h1>
       <p>
-        Este es el panel principal del Sistema Operativo Empresarial e
-        Inteligente.
+        Bienvenido al sistema PGIO. Debajo se muestran las últimas solicitudes
+        procesadas por el motor de inteligencia.
       </p>
+
+      <div th:if="${#lists.isEmpty(solicitudes)}">
+        <p class="mensaje-vacio">No hay solicitudes registradas aún.</p>
+      </div>
+
+      <table class="tabla-resumen" th:if="${!#lists.isEmpty(solicitudes)}">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Título</th>
+            <th>Categoría (IA)</th>
+            <th>Prioridad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="sol : ${solicitudes}">
+            <td th:text="${sol.codigo}" class="codigo"></td>
+            <td th:text="${sol.titulo}"></td>
+            <td>
+              <span th:text="${sol.categoria}" class="categoria"></span>
+            </td>
+            <td>
+              <span
+                th:text="${sol.prioridad}"
+                th:class="${sol.prioridad == 'ALTA' ? 'badge-alta' : 'badge-media'}"
+              >
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </main>
 
     <footer th:replace="~{layout :: footer}"></footer>

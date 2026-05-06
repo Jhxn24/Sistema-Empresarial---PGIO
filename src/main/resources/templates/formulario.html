@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/formularios.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="main-content">
+      <div class="solicitud-box">
+        <h2>Registrar Nueva Solicitud</h2>
+        <p>Complete los detalles de su requerimiento.</p>
+
+        <form
+          th:action="@{/solicitudes/guardar}"
+          th:object="${solicitud}"
+          method="post"
+        >
+          <div class="campo">
+            <label>Título del Problema:</label>
+            <input
+              type="text"
+              th:field="*{titulo}"
+              placeholder="Ej: Error en acceso a servidor de base de datos"
+              required
+            />
+          </div>
+
+          <div class="campo">
+            <label>Descripción:</label>
+            <textarea
+              th:field="*{descripcion}"
+              rows="5"
+              placeholder="Detalle el problema aquí..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="botones">
+            <button type="reset" class="btn-limpiar">Limpiar</button>
+            <button type="submit" class="btn-enviar">Enviar Solicitud</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+  </body>
+</html>
