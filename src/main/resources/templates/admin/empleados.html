@@ -1,0 +1,159 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/empleados.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="main-content">
+      <h1 class="titulo-vista">Gestión de Empleados</h1>
+
+      <div class="tabla-contenedor">
+        <table class="tabla-pgio">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Cargo</th>
+              <th>Departamento</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="emp : ${empleados}">
+              <td th:text="${emp.codigo}" class="txt-bold"></td>
+              <td th:text="${emp.nombre}"></td>
+              <td th:text="${emp.cargo}"></td>
+              <td th:text="${emp.departamento}"></td>
+              <td th:text="${emp.email}"></td>
+              <td th:text="${emp.telefono ?: '---'}"></td>
+              <td>
+                <span
+                  th:text="${emp.estado}"
+                  th:classappend="${emp.estado == 'ACTIVO' ? ' badge-activo' : ' badge-inactivo'}"
+                ></span>
+              </td>
+              <td>
+                <div class="acciones">
+                  <!-- FIX 3a: onclick bien formado con el id del empleado -->
+                  <button
+                    class="btn-accion edit"
+                    title="Editar"
+                    th:data-id="${emp.id}"
+                    onclick="abrirModalEditar(this.dataset.id)"
+                  >
+                    ✏️
+                  </button>
+
+                  <!-- FIX 3b: confirm manejado en JS con confirmarDesactivar(id, nombre) -->
+                  <button
+                    th:if="${emp.estado == 'ACTIVO'}"
+                    class="btn-accion delete"
+                    title="Desactivar"
+                    th:data-id="${emp.id}"
+                    th:data-nombre="${emp.nombre}"
+                    onclick="
+                      confirmarDesactivar(this.dataset.id, this.dataset.nombre)
+                    "
+                  >
+                    🗑️
+                  </button>
+                  <span th:if="${emp.estado != 'ACTIVO'}" class="estado-info"
+                    >Inactivo</span
+                  >
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="acciones-cabecera">
+        <button type="button" class="btn-nuevo" onclick="abrirModalNuevo()">
+          <span>+</span> Añadir Empleado
+        </button>
+      </div>
+
+      <!-- Formulario oculto para desactivar — se rellena por JS -->
+      <form id="formDesactivar" method="post" style="display: none">
+        <input type="hidden" name="_method" value="post" />
+      </form>
+
+      <!-- Modal único para CREAR y EDITAR -->
+      <div id="modalEmpleado" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="modalTitulo">Registrar Nuevo Empleado</h2>
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+          </div>
+          <form
+            id="formEmpleado"
+            th:action="@{/admin/empleados/guardar}"
+            method="post"
+            class="form-pgio"
+          >
+            <input type="hidden" name="id" id="empleadoId" />
+            <input type="hidden" name="codigo" id="empleadoCodigo" />
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombre" id="empleadoNombre" required />
+              </div>
+              <div class="form-group">
+                <label>Cargo:</label>
+                <input type="text" name="cargo" id="empleadoCargo" required />
+              </div>
+              <div class="form-group">
+                <label>Departamento:</label>
+                <input
+                  type="text"
+                  name="departamento"
+                  id="empleadoDepartamento"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Email:</label>
+                <input type="email" name="email" id="empleadoEmail" required />
+              </div>
+              <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="text" name="telefono" id="empleadoTelefono" />
+              </div>
+              <div class="form-group">
+                <label>Estado:</label>
+                <select name="estado" id="empleadoEstado">
+                  <option value="ACTIVO">Activo</option>
+                  <option value="INACTIVO">Inactivo</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cerrarModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <th:block th:replace="~{layout :: scripts(~{::script})}">
+      <script th:src="@{/js/empleados.js}"></script>
+    </th:block>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/inicio.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+    <main class="main-content">
+      <h1>Panel de Administración</h1>
+      <p>
+        Bienvenido, <strong th:text="${username}"></strong>. Tienes acceso
+        completo al sistema.
+      </p>
+
+      <div class="stats-container">
+        <div class="card-stat card-blue">
+          <div class="stat-number" th:text="${totalEmpleados}">0</div>
+          <div>Empleados Registrados</div>
+          <a th:href="@{/admin/empleados}" class="link-stats">Ver todos →</a>
+        </div>
+        <div class="card-stat card-green">
+          <div class="stat-number" th:text="${totalSolicitudes}">0</div>
+          <div>Solicitudes Totales</div>
+          <a th:href="@{/admin/solicitudes}" class="link-stats">Ver todas →</a>
+        </div>
+      </div>
+
+      <h2>Solicitudes Recientes</h2>
+      <div th:if="${#lists.isEmpty(solicitudesRecientes)}">
+        <p class="mensaje-vacio">No hay solicitudes aún.</p>
+      </div>
+
+      <table
+        class="tabla-resumen"
+        th:if="${!#lists.isEmpty(solicitudesRecientes)}"
+      >
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Solicitante</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="sol : ${solicitudesRecientes}">
+            <td th:text="${sol.codigo}" class="codigo"></td>
+            <td th:text="${sol.titulo}"></td>
+            <td th:text="${sol.categoria}"></td>
+            <td>
+              <span
+                th:text="${sol.prioridad}"
+                th:classappend="${sol.prioridad == 'ALTA' ? 'badge-alta' : (sol.prioridad == 'MEDIA' ? 'badge-media' : 'badge-baja')}"
+              >
+              </span>
+            </td>
+            <td th:text="${sol.estado}"></td>
+            <td
+              th:text="${sol.solicitante != null ? sol.solicitante.nombre : '-'}"
+            ></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="acciones-admin">
+        <a th:href="@{/admin/empleados}" class="btn-admin btn-blue"
+          >Gestionar Empleados</a
+        >
+        <a th:href="@{/admin/solicitudes}" class="btn-admin btn-green"
+          >Ver Todas las Solicitudes</a
+        >
+        <a th:href="@{/solicitudes/nueva}" class="btn-admin btn-purple">
+          Nueva Solicitud</a
+        >
+      </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <th:block th:replace="~{layout :: scripts(~{})}"></th:block>
+  </body>
+</html>

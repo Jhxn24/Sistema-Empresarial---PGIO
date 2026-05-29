@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/inicio.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="main-content">
+      <h1>Panel del Resolutor</h1>
+      <p>
+        Bienvenido, <strong th:text="${username}"></strong>. Aquí puedes ver y
+        resolver las solicitudes asignadas.
+      </p>
+
+      <div class="stats-container">
+        <div class="card-stat card-orange">
+          <div class="stat-number" th:text="${#lists.size(misAsignaciones)}">
+            0
+          </div>
+          <div>Mis Asignaciones</div>
+        </div>
+        <div class="card-stat card-blue">
+          <div
+            class="stat-number"
+            th:text="${#lists.size(solicitudesAsignadas)}"
+          >
+            0
+          </div>
+          <div>Solicitudes Asignadas (total)</div>
+        </div>
+      </div>
+
+      <h2>Mis Solicitudes Asignadas</h2>
+      <div th:if="${#lists.isEmpty(misAsignaciones)}">
+        <p class="mensaje-vacio">
+          No tienes solicitudes asignadas en este momento.
+        </p>
+      </div>
+
+      <table class="tabla-resumen" th:if="${!#lists.isEmpty(misAsignaciones)}">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Solicitante</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="sol : ${misAsignaciones}">
+            <td th:text="${sol.codigo}" class="codigo"></td>
+            <td th:text="${sol.titulo}"></td>
+            <td th:text="${sol.categoria}"></td>
+            <td>
+              <span
+                th:text="${sol.prioridad}"
+                th:classappend="${sol.prioridad == 'ALTA' ? 'badge-alta' : (sol.prioridad == 'MEDIA' ? 'badge-media' : 'badge-baja')}"
+              >
+              </span>
+            </td>
+            <td th:text="${sol.estado}"></td>
+            <td
+              th:text="${sol.solicitante != null ? sol.solicitante.nombre : '-'}"
+            ></td>
+            <td>
+              <form
+                th:if="${sol.estado.name() != 'RESUELTA' and sol.estado.name() != 'RECHAZADA'}"
+                th:action="@{'/resolutor/solicitudes/' + ${sol.id} + '/resolver'}"
+                method="post"
+              >
+                <button type="submit" class="btn-resolver">
+                  Marcar Resuelta
+                </button>
+              </form>
+              <span
+                th:if="${sol.estado.name() == 'RESUELTA'}"
+                class="status-resuelta"
+                >Resuelta</span
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div
+        th:if="${!#lists.isEmpty(solicitudesAsignadas) and #lists.size(solicitudesAsignadas) != #lists.size(misAsignaciones)}"
+      >
+        <h2>Otras Solicitudes Asignadas (por el sistema)</h2>
+        <table class="tabla-resumen">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Título</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="sol : ${solicitudesAsignadas}">
+              <td th:text="${sol.codigo}" class="codigo"></td>
+              <td th:text="${sol.titulo}"></td>
+              <td>
+                <span
+                  th:text="${sol.prioridad}"
+                  th:classappend="${sol.prioridad == 'ALTA' ? 'badge-alta' : (sol.prioridad == 'MEDIA' ? 'badge-media' : 'badge-baja')}"
+                >
+                </span>
+              </td>
+              <td th:text="${sol.estado}"></td>
+              <td>
+                <form
+                  th:action="@{'/resolutor/solicitudes/' + ${sol.id} + '/resolver'}"
+                  method="post"
+                >
+                  <button type="submit" class="btn-resolver">✔ Resolver</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <th:block th:replace="~{layout :: scripts(~{})}"></th:block>
+  </body>
+</html>

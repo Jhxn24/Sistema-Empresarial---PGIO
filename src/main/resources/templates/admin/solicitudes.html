@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/empleados.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="main-content">
+      <h1 class="titulo-vista">Todas las Solicitudes</h1>
+
+      <div th:if="${#lists.isEmpty(solicitudes)}">
+        <p class="mensaje-vacio">No hay solicitudes registradas.</p>
+      </div>
+
+      <div class="tabla-contenedor" th:if="${!#lists.isEmpty(solicitudes)}">
+        <table class="tabla-pgio">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Título</th>
+              <th>Categoría</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Solicitante</th>
+              <th>Resolutor</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="sol : ${solicitudes}">
+              <td th:text="${sol.codigo}" class="txt-bold"></td>
+              <td th:text="${sol.titulo}"></td>
+              <td th:text="${sol.categoria}"></td>
+              <td>
+                <span
+                  th:text="${sol.prioridad}"
+                  th:classappend="${sol.prioridad == 'ALTA' ? 'badge-alta' : (sol.prioridad == 'MEDIA' ? 'badge-media' : 'badge-baja')}"
+                >
+                </span>
+              </td>
+              <td th:text="${sol.estado}"></td>
+              <td
+                th:text="${sol.solicitante != null ? sol.solicitante.nombre : '-'}"
+              ></td>
+              <td
+                th:text="${sol.resolutor != null ? sol.resolutor.nombre : 'Mesa de Control'}"
+              ></td>
+              <td
+                th:text="${#temporals.format(sol.fechaRegistro, 'dd/MM/yyyy')}"
+              ></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <th:block th:replace="~{layout :: scripts(~{})}"></th:block>
+  </body>
+</html>
