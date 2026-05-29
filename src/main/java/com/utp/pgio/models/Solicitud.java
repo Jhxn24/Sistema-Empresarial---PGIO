@@ -1,27 +1,76 @@
 package com.utp.pgio.models;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "solicitudes")
 public class Solicitud {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String codigo; // Generado automáticamente (RF01)
+
+    @Column(unique = true, nullable = false, length = 20)
+    private String codigo;
+
+    @Column(nullable = false, length = 60)
     private String titulo;
-    private String descripcion; // Detalle del problema
-    private String categoria; // Sugerida por IA (RF09)
-    private String prioridad; // Calculada por RF02
-    private String fechaRegistro;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String descripcion;
+
+    @Column(length = 40, nullable = false)
+    private String categoria;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EstadoSolicitud estado;
+
+    @Column(name = "fecha_registro", nullable = false, updatable = false)
+    private LocalDateTime fechaRegistro;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "solicitante_id", nullable = false)
+    private Empleado solicitante;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "supervisor_id")
+    private Empleado supervisor;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "resolutor_id")
+    private Empleado resolutor;
+
+    @Column(length = 20)
+    private String prioridad;
 
     public Solicitud() {
-
     }
 
-    public Solicitud(Long id, String codigo, String titulo, String descripcion, String categoria, String prioridad,
-            String fechaRegistro) {
-        this.id = id;
+    public enum EstadoSolicitud {
+        CREADA, EN_REVISION, ASIGNADA, RESUELTA, RECHAZADA
+    }
+
+    @PrePersist
+    protected void guardarFechaSolicitud() {
+        this.fechaRegistro = LocalDateTime.now();
+        this.estado = EstadoSolicitud.CREADA;
+    }
+
+    public Solicitud(String codigo, String titulo, String descripcion,
+            String categoria, Empleado solicitante,
+            Empleado supervisor, Empleado resolutor, String prioridad) {
+
         this.codigo = codigo;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.categoria = categoria;
         this.prioridad = prioridad;
-        this.fechaRegistro = fechaRegistro;
+        this.solicitante = solicitante;
+        this.supervisor = supervisor;
+        this.resolutor = resolutor;
     }
 
     public Long getId() {
@@ -64,6 +113,46 @@ public class Solicitud {
         this.categoria = categoria;
     }
 
+    public EstadoSolicitud getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoSolicitud estado) {
+        this.estado = estado;
+    }
+
+    public LocalDateTime getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    public Empleado getSolicitante() {
+        return solicitante;
+    }
+
+    public void setSolicitante(Empleado solicitante) {
+        this.solicitante = solicitante;
+    }
+
+    public Empleado getSupervisor() {
+        return supervisor;
+    }
+
+    public void setSupervisor(Empleado supervisor) {
+        this.supervisor = supervisor;
+    }
+
+    public Empleado getResolutor() {
+        return resolutor;
+    }
+
+    public void setResolutor(Empleado resolutor) {
+        this.resolutor = resolutor;
+    }
+
     public String getPrioridad() {
         return prioridad;
     }
@@ -72,11 +161,4 @@ public class Solicitud {
         this.prioridad = prioridad;
     }
 
-    public String getFechaRegistro() {
-        return fechaRegistro;
-    }
-
-    public void setFechaRegistro(String fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
 }

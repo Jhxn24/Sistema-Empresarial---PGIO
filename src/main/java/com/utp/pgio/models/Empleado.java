@@ -1,21 +1,42 @@
 package com.utp.pgio.models;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "empleado")
 public class Empleado {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false, length = 50)
     private String codigo;
+    @Column(nullable = false, length = 40)
     private String nombre;
+    @Column(nullable = false, length = 40)
     private String cargo;
+    @Column(nullable = false, length = 40)
     private String departamento;
+    @Column(unique = true, nullable = false, length = 50)
     private String email;
+    @Column(length = 15)
     private String telefono;
+    @Column(length = 20, nullable = false)
     private String estado;
-    private String fechaIngreso;
+    @Column(name = "fecha_ingreso", nullable = false)
+    private LocalDateTime fechaIngreso;
 
     public Empleado() {
     }
 
+    @PrePersist
+    protected void guardarFechaIngreso() {
+        this.fechaIngreso = LocalDateTime.now();
+    }
+
     public Empleado(Long id, String codigo, String nombre, String cargo, String departamento, String email,
-            String telefono, String estado, String fechaIngreso) {
+            String telefono, String estado) {
         this.id = id;
         this.codigo = codigo;
         this.nombre = nombre;
@@ -24,7 +45,6 @@ public class Empleado {
         this.email = email;
         this.telefono = telefono;
         this.estado = estado;
-        this.fechaIngreso = fechaIngreso;
     }
 
     public Long getId() {
@@ -91,11 +111,11 @@ public class Empleado {
         this.estado = estado;
     }
 
-    public String getFechaIngreso() {
+    public LocalDateTime getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public void setFechaIngreso(String fechaIngreso) {
+    public void setFechaIngreso(LocalDateTime fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
 
