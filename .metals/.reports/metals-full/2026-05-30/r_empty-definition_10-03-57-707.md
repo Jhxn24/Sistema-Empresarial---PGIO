@@ -1,3 +1,14 @@
+error id: file:///C:/Users/JEYSSON/Documents/Ciclo%20VII/PGIO/Sistema-Empresarial---PGIO/src/main/java/com/utp/pgio/controllers/LoginController.java:
+file:///C:/Users/JEYSSON/Documents/Ciclo%20VII/PGIO/Sistema-Empresarial---PGIO/src/main/java/com/utp/pgio/controllers/LoginController.java
+empty definition using pc, found symbol in pc: 
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 699
+uri: file:///C:/Users/JEYSSON/Documents/Ciclo%20VII/PGIO/Sistema-Empresarial---PGIO/src/main/java/com/utp/pgio/controllers/LoginController.java
+text:
+```scala
 package com.utp.pgio.controllers;
 
 import java.util.List;
@@ -19,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class LoginController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioRepository@@ usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -80,3 +91,10 @@ public class LoginController {
         }
     }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: 
