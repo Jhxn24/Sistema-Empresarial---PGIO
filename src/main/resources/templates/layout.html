@@ -1,0 +1,87 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head th:fragment="header(links)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo != null ? titulo + ' - PGIO' : 'PGIO'}">
+      PGIO
+    </title>
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <th:block th:replace="${links} ?: ~{}"></th:block>
+  </head>
+  <body>
+    <nav class="navbar" th:fragment="navbar">
+      <div class="nav-logo">
+        <a th:href="@{/inicio}">
+          <img th:src="@{/img/logo-svg.svg}" alt="Logo PGIO" class="logo-img" />
+          <span class="nombre-sistema">PGIO</span>
+        </a>
+      </div>
+      <button class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span><span class="bar"></span
+        ><span class="bar"></span>
+      </button>
+      <ul class="nav-list" id="nav-list">
+        <li><a th:href="@{/inicio}">Inicio</a></li>
+
+        <li sec:authorize="hasRole('ADMIN')">
+          <a th:href="@{/admin/dashboard}">Dashboard Admin</a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+          <a th:href="@{/admin/empleados}">Empleados</a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+          <a th:href="@{/admin/solicitudes}">Solicitudes</a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+          <a th:href="@{/admin/usuarios}">Usuarios</a>
+        </li>
+
+        <li sec:authorize="hasRole('SUPERVISOR')">
+          <a th:href="@{/supervisor/dashboard}">Panel Supervisor</a>
+        </li>
+        <li sec:authorize="hasRole('SUPERVISOR')">
+          <a th:href="@{/supervisor/solicitudes}">Ver Solicitudes</a>
+        </li>
+
+        <li sec:authorize="hasRole('RESOLUTOR')">
+          <a th:href="@{/resolutor/dashboard}">Panel Resolutor</a>
+        </li>
+
+        <li sec:authorize="hasAnyRole('SOLICITANTE','ADMIN')">
+          <a th:href="@{/solicitudes/nueva}">Nueva Solicitud</a>
+        </li>
+
+        <li sec:authorize="isAuthenticated()">
+          <a th:href="@{/logout}" class="nav-logout">
+            Salir (<span sec:authentication="name">usuario</span>)
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <footer class="footer" th:fragment="footer">
+      <div>
+        <p>
+          2026 <strong>PGIO</strong> — Sistema Operativo Empresarial e
+          Inteligente
+        </p>
+      </div>
+    </footer>
+
+    <th:block th:fragment="scripts(vistas_scripts)">
+      <script>
+        const menu = document.getElementById("mobile-menu");
+        const nav = document.getElementById("nav-list");
+        if (menu) {
+          menu.addEventListener("click", () => nav.classList.toggle("active"));
+        }
+      </script>
+      <th:block th:replace="${vistas_scripts} ?: ~{}"></th:block>
+    </th:block>
+  </body>
+</html>

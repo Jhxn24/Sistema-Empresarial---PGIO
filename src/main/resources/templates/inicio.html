@@ -1,0 +1,86 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/inicio.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="main-content">
+      <h1>Panel de Control Operativo</h1>
+      <p>
+        Bienvenido, <strong th:text="${username} ?: 'Usuario'"></strong>.
+        Sistema PGIO activo.
+      </p>
+
+      <div class="accesos-rapidos">
+        <a
+          th:href="@{/admin/dashboard}"
+          sec:authorize="hasRole('ADMIN')"
+          class="card-acceso"
+          >Panel Admin</a
+        >
+        <a
+          th:href="@{/supervisor/dashboard}"
+          sec:authorize="hasRole('SUPERVISOR')"
+          class="card-acceso"
+          >Panel Supervisor</a
+        >
+        <a
+          th:href="@{/resolutor/dashboard}"
+          sec:authorize="hasRole('RESOLUTOR')"
+          class="card-acceso"
+          >Panel Resolutor</a
+        >
+        <a
+          th:href="@{/solicitudes/nueva}"
+          sec:authorize="hasAnyRole('SOLICITANTE','ADMIN')"
+          class="card-acceso"
+          >Nueva Solicitud</a
+        >
+      </div>
+
+      <h2>Últimas Solicitudes</h2>
+
+      <div th:if="${#lists.isEmpty(solicitudes)}">
+        <p class="mensaje-vacio">No hay solicitudes registradas aún.</p>
+      </div>
+
+      <table class="tabla-resumen" th:if="${!#lists.isEmpty(solicitudes)}">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Título</th>
+            <th>Categoría (IA)</th>
+            <th>Prioridad</th>
+            <th>Responsable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="sol : ${solicitudes}">
+            <td th:text="${sol.codigo}" class="codigo"></td>
+            <td th:text="${sol.titulo}"></td>
+            <td th:text="${sol.categoria}"></td>
+            <td>
+              <span
+                th:text="${sol.prioridad}"
+                th:class="${sol.prioridad == 'ALTA' ? 'badge-alta' : (sol.prioridad == 'MEDIA' ? 'badge-media' : 'badge-baja')}"
+              >
+              </span>
+            </td>
+            <td
+              th:text="${sol.resolutor != null ? sol.resolutor.nombre : 'Mesa de Control'}"
+            ></td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <th:block th:replace="~{layout :: scripts(~{})}"></th:block>
+  </body>
+</html>

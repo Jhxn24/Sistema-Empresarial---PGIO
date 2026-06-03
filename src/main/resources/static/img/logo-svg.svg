@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo Blanco -->
+  <rect width="200" height="200" rx="40" fill="#ffffff"/>
+  
+  <!-- Texto PGIO en Azul -->
+  <text x="50%" y="50%" 
+        font-family="Segoe UI, Arial, sans-serif" 
+        font-size="60" 
+        font-weight="bold" 
+        fill="#003366" 
+        text-anchor="middle" 
+        dominant-baseline="central">
+    PGIO
+  </text>
+</svg>

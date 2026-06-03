@@ -1,0 +1,281 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head th:replace="~{layout :: header(~{::link})}">
+    <link rel="stylesheet" th:href="@{/css/usuarios.css}" />
+  </head>
+  <body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="main-content">
+      <h1 class="titulo-vista">Gestión de Usuarios</h1>
+
+      <div
+        th:if="${exito}"
+        class="alerta alerta-exito"
+        th:text="${exito}"
+      ></div>
+      <div
+        th:if="${error}"
+        class="alerta alerta-error"
+        th:text="${error}"
+      ></div>
+
+      <div class="tabla-contenedor">
+        <table class="tabla-pgio">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Usuario (username)</th>
+              <th>Rol</th>
+              <th>Empleado vinculado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="u, stat : ${usuarios}">
+              <td th:text="${stat.count}" class="txt-bold"></td>
+              <td th:text="${u.username}"></td>
+              <td>
+                <span
+                  th:text="${u.roles.isEmpty() ? 'Sin rol' : u.roles.iterator().next().name()}"
+                  th:classappend="${'badge-rol badge-' + (u.roles.isEmpty() ? '' : u.roles.iterator().next().name())}"
+                ></span>
+              </td>
+              <td
+                th:text="${u.empleado != null ? u.empleado.nombre + ' (' + u.empleado.codigo + ')' : '— Sin empleado —'}"
+              ></td>
+              <td>
+                <div class="acciones">
+                  <button
+                    class="btn-accion"
+                    title="Editar rol"
+                    th:data-id="${u.id}"
+                    onclick="abrirModalEditarRol(this.dataset.id)"
+                  >
+                    🛡️
+                  </button>
+
+                  <button
+                    class="btn-accion"
+                    title="Cambiar contraseña"
+                    th:data-id="${u.id}"
+                    th:data-username="${u.username}"
+                    onclick="
+                      abrirModalPassword(this.dataset.id, this.dataset.username)
+                    "
+                  >
+                    🔑
+                  </button>
+                  <button
+                    class="btn-accion"
+                    title="Eliminar usuario"
+                    th:data-id="${u.id}"
+                    th:data-username="${u.username}"
+                    onclick="
+                      confirmarEliminar(this.dataset.id, this.dataset.username)
+                    "
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(usuarios)}">
+              <td
+                colspan="5"
+                style="text-align: center; color: #888; padding: 20px"
+              >
+                No hay usuarios registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="acciones-cabecera">
+        <button type="button" class="btn-nuevo" onclick="abrirModalNuevo()">
+          <span>+</span> Crear Usuario
+        </button>
+      </div>
+
+      <form id="formEliminar" method="post" style="display: none"></form>
+
+      <div id="modalCrear" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="modalTitulo">Crear Nuevo Usuario</h2>
+            <span class="close-btn" onclick="cerrarModal('modalCrear')"
+              >&times;</span
+            >
+          </div>
+          <form
+            th:action="@{/admin/usuarios/crear}"
+            method="post"
+            class="form-pgio"
+          >
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Username (email o nombre):</label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="ej: juan.perez@empresa.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Contraseña:</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Mínimo 6 caracteres"
+                  minlength="6"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Rol:</label>
+                <select name="rol" required>
+                  <option value="">— Seleccionar rol —</option>
+                  <option
+                    th:each="r : ${roles}"
+                    th:value="${r.name()}"
+                    th:text="${r.name().replace('ROLE_', '')}"
+                  ></option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Vincular a empleado (opcional):</label>
+                <select name="empleadoId">
+                  <option value="">— Sin empleado —</option>
+                  <option
+                    th:each="emp : ${empleadosSinUsuario}"
+                    th:value="${emp.id}"
+                    th:text="${emp.nombre + ' · ' + emp.cargo + ' (' + emp.codigo + ')'}"
+                  ></option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cerrarModal('modalCrear')"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-guardar">Crear Usuario</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="modalEditarRol" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Editar Rol</h2>
+            <span class="close-btn" onclick="cerrarModal('modalEditarRol')"
+              >&times;</span
+            >
+          </div>
+          <form id="formEditarRol" method="post" class="form-pgio">
+            <input type="hidden" id="editId" name="_placeholder" />
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label>Usuario:</label>
+                <span
+                  id="editUsername"
+                  style="font-weight: 600; padding: 8px 0"
+                ></span>
+              </div>
+              <div class="form-group full-width">
+                <label>Nuevo Rol:</label>
+                <select id="editRol" name="rol" required>
+                  <option
+                    th:each="r : ${roles}"
+                    th:value="${r.name()}"
+                    th:text="${r.name().replace('ROLE_', '')}"
+                  ></option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cerrarModal('modalEditarRol')"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-guardar">Guardar Rol</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div id="modalPassword" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Cambiar Contraseña</h2>
+            <span class="close-btn" onclick="cerrarModal('modalPassword')"
+              >&times;</span
+            >
+          </div>
+          <form id="formPassword" method="post" class="form-pgio">
+            <input type="hidden" id="pwdId" name="_placeholder" />
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label>Usuario:</label>
+                <span
+                  id="pwdUsername"
+                  style="font-weight: 600; padding: 8px 0"
+                ></span>
+              </div>
+              <div class="form-group full-width">
+                <label>Nueva Contraseña:</label>
+                <input
+                  type="password"
+                  id="nuevaPassword"
+                  name="nuevaPassword"
+                  minlength="6"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cerrarModal('modalPassword')"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-guardar">Actualizar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <th:block th:replace="~{layout :: scripts(~{::script})}">
+      <script th:src="@{/js/usuarios.js}"></script>
+      <script>
+        document
+          .getElementById("formEditarRol")
+          .addEventListener("submit", function () {
+            var id = document.getElementById("editId").value;
+            this.action = "/admin/usuarios/" + id + "/editar-rol";
+          });
+        document
+          .getElementById("formPassword")
+          .addEventListener("submit", function () {
+            var id = document.getElementById("pwdId").value;
+            this.action = "/admin/usuarios/" + id + "/cambiar-password";
+          });
+      </script>
+    </th:block>
+  </body>
+</html>

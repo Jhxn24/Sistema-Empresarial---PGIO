@@ -1,0 +1,40 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - PGIO</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}" />
+  </head>
+
+  <body>
+    <div class="login-container">
+      <h1>PGIO</h1>
+      <p>Sistema operativo empresarial e inteligente</p>
+
+      <!-- FIX 10: mostrar error de credenciales -->
+      <div th:if="${error}" class="login-error">
+        <p th:text="${error}">Error de autenticación</p>
+      </div>
+
+      <!-- Mensaje de logout exitoso -->
+      <div th:if="${param.logout}" class="login-info">
+        <p>Sesión cerrada correctamente.</p>
+      </div>
+
+      <form th:action="@{/login}" method="post">
+        <input type="text" name="username" placeholder="Usuario" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Contraseña"
+          required
+        />
+        <button type="submit">Ingresar</button>
+      </form>
+    </div>
+  </body>
+</html>
